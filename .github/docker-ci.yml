@@ -1,0 +1,24 @@
+name: CI/CD Docker Pipeline
+
+# Quand est-ce que ce pipeline doit se lancer ?
+on:
+  push:
+    branches: [ "main" ] # À chaque push sur la branche principale
+
+# Que doit-il faire ?
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # GitHub démarre un serveur Ubuntu neuf
+
+    steps:
+    # Étape 1 : GitHub télécharge ton code sur le serveur
+    - name: Récupération du code source
+      uses: actions/checkout@v4
+
+    # Étape 2 : Il essaie de construire ton image Docker
+    - name: Test de construction de l'image Docker
+      run: docker build -t mon-api-cloud .
+      
+    # Étape 3 : On affiche un message de succès si tout s'est bien passé
+    - name: Validation
+      run: echo "🚀 L'image Docker a été construite avec succès sur le Cloud !"
