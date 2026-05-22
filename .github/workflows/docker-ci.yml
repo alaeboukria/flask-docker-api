@@ -1,24 +1,26 @@
 name: CI/CD Docker Pipeline
 
-# Quand est-ce que ce pipeline doit se lancer ?
 on:
   push:
-    branches: [ "main" ] # À chaque push sur la branche principale
+    branches: [ "main" ]
 
-# Que doit-il faire ?
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest # GitHub démarre un serveur Ubuntu neuf
+  build-and-push:
+    runs-on: ubuntu-latest
 
     steps:
-    # Étape 1 : GitHub télécharge ton code sur le serveur
     - name: Récupération du code source
       uses: actions/checkout@v4
 
-    # Étape 2 : Il essaie de construire ton image Docker
-    - name: Test de construction de l'image Docker
-      run: docker build -t mon-api-cloud .
+    - name: Connexion au registre Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Construction de l'image (Build)
+      # On attache ton pseudo Docker au nom de l'image
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/mon-api-cloud:latest .
       
-    # Étape 3 : On affiche un message de succès si tout s'est bien passé
+    - name: Envoi de l'image (Push)
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/mon-api-cloud:latest
+
     - name: Validation
-      run: echo "🚀 L'image Docker a été construite avec succès sur le Cloud !"
+      run: echo "🚀 L'image Docker a été publiée avec succès sur Docker Hub !"
